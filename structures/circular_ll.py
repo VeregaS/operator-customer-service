@@ -15,7 +15,6 @@ class ListNode:
 class CircularLinkedList:
     def __init__(self):
         self.head: Optional[ListNode] = None
-        self.tail: Optional[ListNode] = None
 
     def search_by_passport(self, target_passport: str) -> List[Record]:
         ans: List[Record] = [] 
@@ -42,24 +41,20 @@ class CircularLinkedList:
                 break
             current = current.next
         return ans
-    
-    def find_tail(self) -> Optional['ListNode']:
-        if not self.head:
-            return None
-        current: ListNode = self.head
-        while current.next and current.next != self.head:
-            current = current.next
-        return current
         
     def delete_by_passport(self, passport_target: str) -> None:
         if not self.head:
             return
+        size = 1
+        temp = self.head
+        while temp.next and temp.next != self.head:
+            size += 1
+            temp = temp.next
         current: ListNode = self.head
-        previous: 'ListNode' = self.find_tail() # type: ignore
-        while True:
+        previous: ListNode = temp
+        for _ in range(size):
             next_node: Optional['ListNode'] = current.next
-            if next_node is None:
-                break
+            assert next_node is not None
             if current.record.passport_num == passport_target:
                 if current == current.next:
                     self.head = None
@@ -71,19 +66,21 @@ class CircularLinkedList:
             else:
                 previous = current
                 current = next_node
-            if current == self.head or not self.head:
-                break
-    
+
     def delete_by_sim(self, sim_target: str) -> None:
         if not self.head:
             return
+        size = 1
+        temp = self.head
+        while temp.next and temp.next != self.head:
+            size += 1
+            temp = temp.next
         current: ListNode = self.head
-        previous: 'ListNode' = self.find_tail() # type: ignore
-        while True:
+        previous: ListNode = temp 
+        for _ in range(size):
             next_node: Optional['ListNode'] = current.next
-            if next_node is None:
-                break
-            if current.record.passport_num == sim_target:
+            assert next_node is not None
+            if current.record.sim_num == sim_target:
                 if current == current.next:
                     self.head = None
                     break 
@@ -94,8 +91,7 @@ class CircularLinkedList:
             else:
                 previous = current
                 current = next_node
-            if current == self.head or not self.head:
-                break
+
     
     def insert(self, data: Record) -> None:
         new_node = ListNode(data)
