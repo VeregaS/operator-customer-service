@@ -1,3 +1,6 @@
+import json
+import os
+from dataclasses import asdict
 from typing import List, Tuple, Optional
 from models import Client, SimCard, Record
 from structures.avl_tree import AVLTree
@@ -144,3 +147,39 @@ class CellularOperatorSystem:
         active_record.date_end = date_end
         sim.is_available = True
         return True, "SIM-карта успешно возвращена."
+
+    # ==========================================
+    # 4. СОХРАНЕНИЕ И ЗАГРУЗКА ДАННЫХ (JSON)
+    # ==========================================
+
+    def save_data(self, directory: str = "data") -> None:
+        """Сохранение всех данных в JSON файлы."""
+        os.makedirs(directory, exist_ok=True)
+        clients_data = [asdict(c) for c in self.get_all_clients()]
+        with open(os.path.join(directory, "clients.json"), "w", encoding="utf-8") as f:
+            json.dump(clients_data, f, ensure_ascii=False, indent=4)
+        sims_data = [asdict(s) for s in self.get_all_sims()]
+        with open(os.path.join(directory, "sims.json"), "w", encoding="utf-8") as f:
+            json.dump(sims_data, f, ensure_ascii=False, indent=4)
+        records_data = [asdict(r) for r in self.records.get_all()]
+        with open(os.path.join(directory, "records.json"), "w", encoding="utf-8") as f:
+            json.dump(records_data, f, ensure_ascii=False, indent=4)
+
+    def load_data(self, directory: str = "data") -> None:
+        """Загрузка данных из JSON файлов и восстановление структур."""
+        clients_path = os.path.join(directory, "clients.json")
+        if os.path.exists(clients_path):
+            with open(clients_path, "r", encoding="utf-8") as f:
+                for item in json.load(f):
+                    self.clients.insert(Client(**item))
+        sims_path = os.path.join(directory, "sims.json")
+        if os.path.exists(sims_path):
+            with open(sims_path, "r", encoding="utf-8") as f:
+                for item in json.load(f):
+                    self.sim_cards.insert(SimCard(**item))
+        records_path = os.path.join(directory, "records.json")
+        if os.path.exists(records_path):
+            with open(records_path, "r", encoding="utf-8") as f:
+                for item in json.load(f):
+                    self.records.insert(Record(**item))
+            self.records.sort()

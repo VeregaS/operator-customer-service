@@ -127,3 +127,16 @@ class CircularLinkedList:
             current.next = new_node
             current = new_node
         current.next = self.head
+
+    def get_all(self) -> List[Record]:
+        """Возвращает все записи в виде обычного списка."""
+        ans: List[Record] = []
+        if not self.head:
+            return ans
+        current: ListNode = self.head
+        while True:
+            ans.append(current.record)
+            if current.next is None or current.next == self.head:
+                break
+            current = current.next
+        return ans
