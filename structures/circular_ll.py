@@ -1,6 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from models import Record
 from typing import Optional, List
-
+from algorithms import counting_sort_records
 
 class ListNode:
     def __init__(self, record: Record):
@@ -106,3 +110,24 @@ class CircularLinkedList:
                 current = current.next
             current.next = new_node
             new_node.next = self.head
+            
+    def sort(self) -> None:
+        """Сортирует список и перестраивает связи."""
+        if self.head is None or self.head.next == self.head:
+            return
+        records: List[Record] = []
+        current: ListNode = self.head
+        assert current is not None
+        while True:
+            records.append(current.record)
+            if current.next is None or current.next == self.head:
+                break
+            current = current.next
+        sorted_records = counting_sort_records(records)
+        self.head = ListNode(sorted_records[0])
+        current = self.head
+        for i in range(1, len(sorted_records)):
+            new_node = ListNode(sorted_records[i])
+            current.next = new_node
+            current = new_node
+        current.next = self.head
